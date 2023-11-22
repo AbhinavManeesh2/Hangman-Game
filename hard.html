@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangman Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  </div>
+  <div class="game">
+  <div id="wordGuess">
+    <p class="Word">Fetching word...</p>
+  </div>
+  <div class="container">
+    <div class="letter-buttons">
+      <button class="letter" id="A" onclick="getLetter('A'); changeBtnColor('A');">A</button>
+      <button class="letter" id="B" onclick="getLetter('B'); changeBtnColor('B');">B</button>
+      <button class="letter" id="C" onclick="getLetter('C'); changeBtnColor('C');">C</button>
+      <button class="letter" id="D" onclick="getLetter('D'); changeBtnColor('D');">D</button>
+      <button class="letter" id="E" onclick="getLetter('E'); changeBtnColor('E');">E</button>
+      <button class="letter" id="F" onclick="getLetter('F'); changeBtnColor('F');">F</button>
+      <button class="letter" id="G" onclick="getLetter('G'); changeBtnColor('G');">G</button>
+      <button class="letter" id="H" onclick="getLetter('H'); changeBtnColor('H');">H</button>
+      <button class="letter" id="I" onclick="getLetter('I'); changeBtnColor('I');">I</button>
+      <button class="letter" id="J" onclick="getLetter('J'); changeBtnColor('J');">J</button>
+      <button class="letter" id="K" onclick="getLetter('K'); changeBtnColor('K');">K</button>
+      <button class="letter" id="L" onclick="getLetter('L'); changeBtnColor('L');">L</button>
+      <button class="letter" id="M" onclick="getLetter('M'); changeBtnColor('M');">M</button>
+      <button class="letter" id="N" onclick="getLetter('N'); changeBtnColor('N');">N</button>
+      <button class="letter" id="O" onclick="getLetter('O'); changeBtnColor('O');">O</button>
+      <button class="letter" id="P" onclick="getLetter('P'); changeBtnColor('P');">P</button>
+      <button class="letter" id="Q" onclick="getLetter('Q'); changeBtnColor('Q');">Q</button>
+      <button class="letter" id="R" onclick="getLetter('R'); changeBtnColor('R');">R</button>
+      <button class="letter" id="S" onclick="getLetter('S'); changeBtnColor('S');">S</button>
+      <button class="letter" id="T" onclick="getLetter('T'); changeBtnColor('T');">T</button>
+      <button class="letter" id="U" onclick="getLetter('U'); changeBtnColor('U');">U</button>
+      <button class="letter" id="V" onclick="getLetter('V'); changeBtnColor('V');">V</button>
+      <button class="letter" id="W" onclick="getLetter('W'); changeBtnColor('W');">W</button>
+      <button class="letter" id="X" onclick="getLetter('X'); changeBtnColor('X');">X</button>
+      <button class="letter" id="Y" onclick="getLetter('Y'); changeBtnColor('Y');">Y</button>
+      <button class="letter" id="Z" onclick="getLetter('Z'); changeBtnColor('Z');">Z</button>
+    </div>
+  </div>
+  <a href="intro.html"><button class="intro" id="back">Back To Menu</button></a>
+  <br>
+  <div id="lives">
+    <h2 class="lifeCounter"></h2>
+  </div>
+  <script>
+
+const wordBank = [];
+
+//Initializing number of guesses
+var guessesLeft = 10;
+
+//Fetch the word to guess using a random word API
+const word_to_guess_from_web = function(length) {
+    const url = `https://random-word-api.herokuapp.com/word?length=${length}`;
+    fetch(url)
+        .then(response => {
+            // Check if the request was successful
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(word => {
+            init_game(word);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error.message);
+            document.getElementById('wordDisplay').textContent = 'Failed to fetch the word';
+        });
+
+};
+
+//Fetching a word of length 10-12 using the API - hard mode
+let randomLength = Math.round(Math.random()*2 + 10);
+word_to_guess_from_web(randomLength);
+
+let wordArray;
+let guessArray;
+
+//Game initialization
+const init_game = function(word) {
+    document.querySelector("#wordGuess .Word").textContent = "";
+    this.wordToGuess = word[0].toUpperCase();
+
+    //Refreshing the guesses left HTMl element
+    if (document.querySelector("#lives .lifeCounter").textContent !== `Guesses Left: ${guessesLeft}`) {
+        document.querySelector("#lives .lifeCounter").textContent += `Guesses Left: ${guessesLeft}`;
+    }
+    const EmptyWord = document.querySelector("#wordGuess .Word").textContent;
+
+    //Creating the 2 arrays and setting their values
+    this.wordArray = new Array(this.wordToGuess.length);
+    this.guessArray = new Array(this.wordToGuess.length);
+
+    //Initializing value of guess array and creating dashes representing the hidden word
+    for (let i = 0; i < this.wordToGuess.length; i++) {
+        document.querySelector("#wordGuess .Word").textContent += "_ ";
+        this.guessArray[i] = "_ ";
+    }
+
+    //Initializing the value of the word array - array containing each letter of hidden word
+    for (let y = 0; y < wordToGuess.length; y++) {
+        this.wordArray[y] = this.wordToGuess.charAt(y);
+    }
+
+
+}
+
+//Function to change button color to change guesses left text color
+const changeBtnColor = function(id) {
+    //Checks to make sure user still has guesses left - don't reduce lives if already at 0
+    if (guessesLeft >= 1) {
+        //Setting the guesses left text element to a variable called letterBtn
+        const letterBtn = document.querySelector(`.letter#${id}`);
+        
+        //Check to see if letter clicked is in word
+        if (this.wordArray.includes(id)) {
+          //If the letter clicked is in the word, change that letter's button to green and disable it
+            letterBtn.style.backgroundColor = "green";
+            letterBtn.disabled = true;
+        } else {
+            //If letter not in word, subtract a life and refresh life counter
+            guessesLeft--;
+            document.querySelector("#lives .lifeCounter").textContent = `Guesses Left: ${guessesLeft}`;
+
+            //Disable letter button and make it gray to signal that it's not in word
+            letterBtn.style.backgroundColor = "gray";
+            letterBtn.disabled = true;
+
+            //Set text color of guesses left to signal how close a user is to using
+            if (guessesLeft < 4 && guessesLeft > 2) {
+                document.querySelector("#lives .lifeCounter").style.color = "yellow";
+            } else if (guessesLeft <= 2) {
+                document.querySelector("#lives .lifeCounter").style.color = "red";
+            } else {
+                document.querySelector("#lives .lifeCounter").style.color = "lime";
+            }
+        }
+    } else {
+        //If out of guesses - YOU LOSE and reveal word
+        document.querySelector("#lives .lifeCounter").textContent = `You lost! The word was ${wordToGuess}`;
+    }
+
+}
+
+//Counter of how many letters in hidden word user has guessed correctly
+var correctLetters = 0;
+
+//getLetter based on what button is clicked - parameter is the id of the button clicked
+const getLetter = function(clickedLetter) {
+    //First checks if game is ongoing, then checks if clicked letter is within word
+    if (correctLetters !== this.wordArray.length + 1 && guessesLeft > 0) {
+        for (let j = 0; j < this.wordArray.length; j++) {
+            if (clickedLetter === this.wordArray[j]) {
+                //updates correctletters and guess array if clicked letter is in the word
+                correctLetters++;
+                this.guessArray[j] = clickedLetter + " ";
+            }
+        }
+
+        //Refreshing dashes on screen to match guess Array
+        document.querySelector("#wordGuess .Word").textContent = "";
+
+        for (let i = 0; i < this.guessArray.length; i++) {
+            if (guessesLeft > 0)
+                document.querySelector("#wordGuess .Word").textContent += this.guessArray[i];
+        }
+    }
+
+    //Changes life counter element to either a win statement or lose statement
+    if (guessesLeft > 0 && correctLetters == this.wordArray.length) {
+        document.querySelector("#lives .lifeCounter").textContent = `You win! The word was ${wordToGuess}`;
+        document.querySelector("#lives .lifeCounter").style.color = "lime";
+    } else {
+        if (guessesLeft == 0) {
+            document.querySelector("#lives .lifeCounter").textContent = `You lost! The word was ${wordToGuess}`;
+        }
+    }
+}
+
+  </script>
+</body>
